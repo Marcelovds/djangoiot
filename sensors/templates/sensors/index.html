@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container-xxl">
+    <div class="row">
+        <h1>Variáveis</h1>
+    </div>
+    <div class="row row-cols-auto">
+        {% for sensor in sensors %}
+        <div class="card-wrapper col-sm-12 col-md-5 col-lg-4 col-xl-3">
+            {% if sensor.type == "temperatura" %}
+                {% include "sensors/temperatura/card.html" %}
+            {% endif %}
+            {% if sensor.type == "umidade" %}
+            {% include "sensors/umidade/card.html" %}
+        {% endif %}
+            {% if sensor.type == "pressao" %}
+                {% include "sensors/pressao/card.html" %}
+            {% endif %}
+            {% if sensor.type == "vazao" %}
+                {% include "sensors/vazao/card.html" %}
+            {% endif %}
+            {% if sensor.type == "bateria" %}
+            {% include "sensors/bateria/card.html" %}
+        {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

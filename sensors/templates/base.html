@@ -1,0 +1,55 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Marcelo Vieira">
+    <meta name="generator" content="0.0.5">
+
+    <link rel="icon" href="{% static '/FaviconGreenBug.png' %}">
+    <title>{% block title %}Datalogger{% endblock %}</title>
+
+    <link href="{% static '/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static '/css/bootstrap-dark.min.css' %}" rel="stylesheet">
+    <link href="{% static '/css/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static '/css/custom.css' %}" rel="stylesheet">
+    <link href="{% static '/css/Chart.min.css' %}" rel="stylesheet">
+    <meta name="theme-color" content="#7952b3">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Datalogger</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item active">
+                    <a class="nav-link" aria-current="page" href="/">Variáveis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Procura</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<script src="{% static '/js/jquery.min.js' %}"></script>
+<script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static '/js/Chart.bundle.min.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

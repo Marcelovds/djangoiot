@@ -1,0 +1,16 @@
+<div class="card" style="">
+    <div class="card-header">
+        {{ sensor.name }}
+    </div>
+    <div class="card-body">
+        <p class="sensor-measure text-center"><i class="bi bi-droplet-half"></i></p>
+            <p class="sensor-measure text-center">
+            {% if sensor.last_data and sensor.last_data.umidade %}
+                {{ sensor.last_data.umidade }} %
+            {% else %}
+                -
+            {% endif %}
+        </p>
+        <a href="{% url 'sensor_detail' sensor.slug %}" class="btn btn-primary btn-block">Ver dados</a>
+    </div>
+</div>

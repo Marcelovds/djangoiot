@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container-xxl">
+    <h1>{{ sensor.name }}</h1>
+
+    <div class="row" id="stats">
+        <div class="col-md-12">
+            <h5>Pressao</h5>
+            <label>Min:</label> <span id="min-pressao" class="badge rounded-pill bg-dark"></span>
+            <label>Max:</label> <span id="max-pressao" class="badge rounded-pill bg-dark"></span>
+            <label>Média:</label> <span id="avg-pressao" class="badge rounded-pill bg-dark"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <canvas id="myChart" width="400" height="220"></canvas>
+        </div>
+    </div>
+    <div class="container">
+        <div class="col-sm">
+            <select id="date-range" class="form-select dark" aria-label="Data range">
+                <option value="1">- 1h</option>
+                <option value="8">- 8h</option>
+                <option value="24" selected>- 24h</option>
+                <option value="48">D-2</option>
+                <option value="168">D-7</option>
+            </select>
+        </div>
+    </div>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let colors = [
+    "rgb(153, 102, 255)", // purple
+    "rgb(54, 162, 235)", // blue
+    "rgb(75, 192, 192)", // green
+    "rgb(201, 203, 207)", // grey
+    "rgb(255, 159, 64)", // orange
+    "rgb(255, 99, 132)", // red
+    "rgb(255, 205, 86)" //yellow
+];
+
+let myChart;
+
+// make sure the 'selected' option is actually selected (Firefox selects the last one the user picked)
+$("#date-range option[selected]").prop('selected', true);
+
+$('#date-range').on('change', function() {
+    let from_timestamp = (new Date()).getTime() - this.value * 60 * 60 * 1000;
+    let to_timestamp = (new Date()).getTime();
+    myChart.destroy();
+    chart('{{ sensor.slug }}', from_timestamp, to_timestamp);
+});
+
+async function getSensorData(sensorId, from_timestamp, to_timestamp) {
+    let from_timestamp_seconds = parseInt(from_timestamp/1000);
+    let to_timestamp_seconds = parseInt(to_timestamp/1000);
+    try {
+        let data = await $.getJSON("/sensors/api/data/" + sensorId + "?from=" + from_timestamp_seconds + "&to=" + to_timestamp_seconds);
+        let timeseries = {};
+        for (let i=0; i<data.data.length; i++) {
+            let point = data.data[i];
+            for (let attr in point) {
+                if (attr === 'date') continue;
+
+                if (!timeseries[attr]) timeseries[attr] = [];
+                timeseries[attr].push({
+                    x: new Date(parseInt(point['date'])),
+                    y: point[attr]
+                });
+            }
+        }
+        return timeseries;
+    } catch (err) {
+        console.log("Erro ao carregar dados do sensor");
+    }
+}
+
+function convertSeriesToDatasets(series) {
+    var datasets = [];
+    var color=0;
+    for (var attr in series) {
+        datasets.push({
+            label: attr,
+            data: series[attr],
+            backgroundColor: Chart.helpers.color(colors[color]).alpha(0.5).rgbString(),
+            borderColor: colors[color],
+            borderWidth: 1,
+            pointStyle: 'circle',
+            pointRadius: 0,
+            pointBorderWidth: 0,
+            pointHitRadius: 6
+        });
+        color++;
+    }
+    return datasets;
+}
+
+function updateStats(data) {
+    if (!data.pressao) {
+        $('#stats').hide();
+    } else {
+        let min, max, sum = 0;
+        data.pressao.forEach(point => {
+            var value = parseFloat(point.y, 10);
+            if (!min || value < min) min = value;
+            if (!max || value > max) max = value;
+            sum += value;
+        });
+        let avg = Math.round(sum/data.pressao.length * 10) / 10;
+
+        $('#min-pressao').html(min + ' mca');
+        $('#max-pressao').html(max + ' mca');
+        $('#avg-pressao').html(méd + ' mca');
+
+        $('#stats').show();
+    }
+}
+
+async function chart(sensorId, from_timestamp, to_timestamp) {
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var data = await getSensorData(sensorId, from_timestamp, to_timestamp);
+    var datasets = convertSeriesToDatasets(data);
+    console.log(data);
+    updateStats(data);
+
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            layout: {
+                padding: {
+                    left: -20
+                }
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    display: true,
+                    time: {
+                        minUnit: 'minute',
+                        round: 'minute'
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Date'
+                    },
+                    ticks: {
+                        fontColor: 'white',
+                        major: {
+                            fontStyle: 'bold',
+                            fontColor: '#FF0000'
+                        }
+                    },
+                    gridLines: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        zeroLineColor: 'rgba(255, 255, 255, 0.2)'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true
+                    },
+                    ticks: {
+                        fontColor: 'white'
+                    },
+                    gridLines: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        zeroLineColor: 'rgba(255, 255, 255, 0.2)'
+                    }
+                }]
+            }
+        }
+    });
+}
+
+let hours = $("#date-range option[selected]").val();
+let from_timestamp = (new Date()).getTime() - hours * 60 * 60 * 1000;
+let to_timestamp = (new Date()).getTime();
+chart('{{ sensor.slug }}', from_timestamp, to_timestamp);
+</script>
+{% endblock %}

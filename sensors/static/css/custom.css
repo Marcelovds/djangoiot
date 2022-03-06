@@ -1,0 +1,29 @@
+body {
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+main {
+    padding-top: 20px;
+}
+
+.card-wrapper {
+    padding: 10px;
+}
+
+.sensor-measure {
+    font-size: 3em;
+}
+
+.icon-large {
+    font-size: 6em;
+}
+
+.form-select.dark {
+    background-color: #050505;
+    color: white;
+    border: 1px solid #111;
+}
+.form-select.dark:focus {
+    box-shadow: 0 0 0 .25rem rgba(60, 60, 60, .25)
+}
