@@ -47,16 +47,16 @@ def api_add_data(request, slug):
     try:
         sensor = Sensor.objects.get(slug=slug)
     except Sensor.DoesNotExist:
-        return JsonResponse({'error': 'Sensor not found'}, status=404)
+        return JsonResponse({'erro': 'Sensor não encontrado'}, status=404)
 
     if request.method == 'POST':
         try:
             sensor_data = json.loads(request.body)
         except JSONDecodeError:
-            return JsonResponse({'error': 'Error parsing data'}, status=400)
+            return JsonResponse({'erro': 'Erro relacionado ao dado'}, status=400)
 
         save_sensor_data(sensor_data, sensor)
-        return JsonResponse({'result': 'ok'})
+        return JsonResponse({'resultado': 'ok'})
     else:
         [from_date, to_date] = parse_date_range(request)
         return JsonResponse({

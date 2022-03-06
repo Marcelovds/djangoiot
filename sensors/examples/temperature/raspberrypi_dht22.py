@@ -24,5 +24,6 @@ try:
     print('Temp= {0:0.1f} *C  Umidade= {1:0.1f} % Pressao= {2:0.1f} mca  Vazao= {3:0.1f} m3/min  Bateria= {4:0.1f} V'.format(
         temperatura, umidade, pressao, vazao, bateria))
     send(round(bateria, 1))
+
 except:
     print('Erro ao enviar dado')
